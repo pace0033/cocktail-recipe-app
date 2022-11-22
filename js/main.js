@@ -27,10 +27,25 @@ function handleSearch(ev) {
   const url = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`;
   fetch(url)
     .then((res) => res.json())
-    .then((data) => console.log(data))
+    .then((data) => {
+      console.log(data.drinks);
+      showResults(data.drinks);
+    })
     .catch((err) => {
       console.error(err);
       error.textContent = `ERROR: ${err.message}`;
       error.classList.remove('hidden');
     });
+}
+
+function showResults(drinks) {
+  const drinksList = document.querySelector('.drinks');
+  const html = drinks
+    .map((cocktail) => {
+      return `
+      <li class="card">${cocktail.strDrink}</li>
+    `;
+    })
+    .join('');
+  drinksList.innerHTML = html;
 }
