@@ -23,6 +23,8 @@ function handleSearch(ev) {
 
   // check localstorage for search key
   // if the key exists, DON'T FETCH and get data from localstorage instead
+  // TODO: Retrieve searchTerm results from localstorage if it exists
+
   // if the key doesn't exist, fetch from the API and store the results in localstorage
   const url = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`;
   fetch(url)
@@ -30,6 +32,10 @@ function handleSearch(ev) {
     .then((data) => {
       console.log(data.drinks);
       showResults(data.drinks);
+
+      const key = searchTerm;
+      const value = JSON.stringify(data.drinks);
+      localStorage.setItem(key, value);
     })
     .catch((err) => {
       console.error(err);
