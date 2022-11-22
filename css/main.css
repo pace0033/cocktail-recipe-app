@@ -8,6 +8,10 @@
   width: 1px;
 }
 
+.hidden {
+  display: none;
+}
+
 .container {
   max-width: 65rem;
   margin-inline: auto;
@@ -31,4 +35,8 @@ form input {
 
 h1 {
   text-align: center;
+}
+
+.error {
+  color: red;
 }
