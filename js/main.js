@@ -1,3 +1,5 @@
+import { NetworkError } from './utils.js';
+
 // API Docs: https://www.thecocktaildb.com/api.php
 const button = document.getElementById('search');
 // set click event listener on button
@@ -22,26 +24,43 @@ function handleSearch(ev) {
   }
 
   // check localstorage for search key
-  // if the key exists, DON'T FETCH and get data from localstorage instead
-  // TODO: Retrieve searchTerm results from localstorage if it exists
+  const storage = localStorage.getItem(searchTerm);
+  if (storage) {
+    // we found something in localstorage
+    // show the drinks on the screen from our localstorage results
+    console.log('found something!');
+    console.log(storage);
+    const drinks = JSON.parse(storage);
+    console.log(drinks);
+    showResults(drinks);
+  } else {
+    // nothing was found, let's FETCH!
+    console.log('nothing in localstorage');
+    // if the key doesn't exist, fetch from the API and store the results in localstorage
+    const url = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`;
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new NetworkError('Failed API Call', res);
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data.drinks);
+        showResults(data.drinks);
 
-  // if the key doesn't exist, fetch from the API and store the results in localstorage
-  const url = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`;
-  fetch(url)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log(data.drinks);
-      showResults(data.drinks);
-
-      const key = searchTerm;
-      const value = JSON.stringify(data.drinks);
-      localStorage.setItem(key, value);
-    })
-    .catch((err) => {
-      console.error(err);
-      error.textContent = `ERROR: ${err.message}`;
-      error.classList.remove('hidden');
-    });
+        // save into localstorage
+        const key = searchTerm;
+        const value = JSON.stringify(data.drinks);
+        localStorage.setItem(key, value);
+      })
+      .catch((err) => {
+        if (err.name === 'NetworkError') {
+          console.log('we had a network error!');
+        }
+        console.error(err);
+        error.textContent = `ERROR: ${err.message}`;
+        error.classList.remove('hidden');
+      });
+  }
 }
 
 function showResults(drinks) {
